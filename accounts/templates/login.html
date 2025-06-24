@@ -7,11 +7,47 @@
 </head>
 <body>
     <h2>Login</h2>
-    <h2>Login</h2>
-    <form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Login</button>
+    <label for="usr">UserName</label>
+    <input type="text" id="usr" placeholder="Enter Username">
+    <label for="psd">Password</label>
+    <input type="password" id="pwd" placeholder="Enter Password">
+    <button type="submit" onclick="login()">Login</button>
+    <script>
+        function login(){
+            let usrname = document.getElementById("usr").value;
+            let password = document.getElementById("pwd").value;
+            fetch("http://127.0.0.1:8000/api/login/",{
+                method:"POST",
+                headers: {
+                 "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                   username: usrname,
+                   password: password
+                })
+            })
+            .then(response => {
+        if (!response.ok) {
+            throw new Error("Server error");
+        }
+        return response.json();
+        })
+            .then(data => {
+                alert("Login successful");
+                console.log("Access Token:", data.access);
+                console.log("Refresh Token:", data.refresh);
+
+                // Store token for later use (optional)
+                localStorage.setItem("access_token", data.access);
+                localStorage.setItem("refresh_token", data.refresh);
+                window.location.href = "http://127.0.0.1:8000/api/dashboard-page/";
+            })
+            .catch(error =>{
+               alert("Login failed ❌");
+                console.error("Login error:", error);
+            });
+        }
+    </script>
 </form>
 </body>
 </html>

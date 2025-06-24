@@ -9,6 +9,7 @@ from rest_framework.generics import CreateAPIView
 from rest_framework_simplejwt.tokens import RefreshToken, TokenError
 from rest_framework.views import APIView
 from rest_framework_simplejwt.token_blacklist.models import BlacklistedToken
+from rest_framework.permissions import IsAuthenticated
 class RegisterView(CreateAPIView):
     queryset=  User.objects.all()
     serializer_class = UserRegistrationSerializer
@@ -55,5 +56,24 @@ class CustomLogOut(APIView):
             return Response({"error": "Refresh token required"}, status=status.HTTP_400_BAD_REQUEST)
         except TokenError:
             return Response({"error": "Token is invalid or expired"}, status=status.HTTP_400_BAD_REQUEST)
+        
+class ProfileView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        user = request.user
+        return Response({
+            "username": user.username,
+            "email": user.email
+        })        
+
+def register_page(request):
+    return render(request,'register.html')
+def login_page(request):
+    return render(request,'login.html')
+def dashboard_page(request):
+    return render(request,'Dashboard.html')
+
+    
 
 

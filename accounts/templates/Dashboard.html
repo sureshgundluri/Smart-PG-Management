@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DashBoard</title>
+</head>
+<body>
+    <h1>Smart PG Management</h1>
+    <div id="info"></div>
+  <button onclick="logout()">Logout</button>
+
+  <script>
+    // ✅ Check if access token exists
+    const accessToken = localStorage.getItem("access_token");
+    if (!accessToken) {
+      alert("You are not logged in!");
+      window.location.href = "login.html";
+    }
+
+    // ✅ Fetch protected data using token
+    fetch("http://127.0.0.1:8000/api/profile/", {
+      method: "GET",
+      headers: {
+        "Authorization": "Bearer " + accessToken
+      }
+    })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error("Access denied");
+      }
+      return response.json();
+    })
+    .then(data => {
+      document.getElementById("info").innerHTML = `
+        <p><strong>Welcome, ${data.username}!</strong></p>
+        <p>Email: ${data.email}</p>
+      `;
+    })
+    .catch(error => {
+      console.error("Token invalid or expired:", error);
+      alert("Session expired. Please login again.");
+      window.location.href = "http://127.0.0.1:8000/api/login_page";
+    });
+
+    // 🔒 Logout function
+    function logout() {
+      localStorage.removeItem("access_token");
+      localStorage.removeItem("refresh_token");
+      alert("Logged out ✅");
+      window.location.href = "http://127.0.0.1:8000/api/login_page";
+    }
+  </script>
+</body>
+</html>
